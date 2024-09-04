@@ -19,3 +19,4 @@ class Category(models.Model):
     @property
     def is_root_category(self):
         return self.parent is None
+ 

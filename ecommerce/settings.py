@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -138,8 +139,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
+###  Added 
+###  Added 
+###  Added 
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -153,6 +155,23 @@ REST_FRAMEWORK = {
 }
 
 
+# Session will expire after 1 week (604800 seconds)
+SESSION_COOKIE_AGE = 604800  
+
+# Session will not expire when the browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+
 ###  Change this before deploying 
 ###  In other to configure live email verification services
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SIMPLE_JWT = {
+    # "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+}

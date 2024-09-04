@@ -5,9 +5,16 @@ from django.core.mail import send_mail
 from .models import Product
 
 @receiver(post_save, sender=Product)
-def check_store_creation(sender, instance, **kwargs):
-    user = instance.store.owner
-    if not user.stores.exists() and Product.objects.filter(store__owner=user).count() >= 2:
+def check_store_creation(sender, instance, created, **kwargs):
+    print("Testing Signals")
+    print(f"instance: {instance}")
+    print(f"sender: {sender.filter.count()}")
+    print("End Testing Signals")
+
+    user = instance.store
+    if user and created:
+        print("Testing Signals Created")
+        print(user)
         send_mail(
             'Store Creation Required',
             'Please create a store to list more than 2 products.',
