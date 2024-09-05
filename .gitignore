@@ -2,3 +2,5 @@ ecomenv
 db.sqlite3
 *pycache*
 *migrations*
+*.cypthon*
+migrations

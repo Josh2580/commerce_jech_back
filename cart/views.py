@@ -48,7 +48,7 @@ class CartRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     
 
 
-class CartItemCreateUpdateDeleteView(generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
+class CartItemCreateUpdateDeleteView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -77,6 +77,28 @@ class CartItemCreateUpdateDeleteView(generics.CreateAPIView, generics.UpdateAPIV
             
         else:
             serializer.save(cart=cart)
+
+    # def perform_update(self, serializer):
+    #     cart = self.get_cart()
+    #     product_id = self.request.data.get('product')
+    #     product = Product.objects.get(id=product_id)
+    #     cart_item = CartItem.objects.get(cart=cart, product=product)
+    #     serializer.save(cart=cart_item.cart)
+
+    # def perform_destroy(self, instance):
+    #     instance.delete()
+
+class CartItemUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CartItemSerializer
+    queryset = CartItem.objects.all()
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_cart(self):
+        if self.request.user.is_authenticated:
+            return Cart.objects.get_or_create(user=self.request.user)[0]
+        session_key = self.request.session.session_key or self.request.session.create()
+        return Cart.objects.get_or_create(session_key=session_key)[0]
+
 
     def perform_update(self, serializer):
         cart = self.get_cart()
