@@ -17,4 +17,4 @@ class ProductSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'product_id', 'name', 'owner', 'slug', 'description', 'price', 'stock', 'store', 'categories', 'image', 'created_at', 'updated_at']
+        fields = ['id', 'product_id', 'name', 'owner', 'slug', 'description', 'price', 'stock', 'store', 'categories', 'image', 'image_url', 'created_at', 'updated_at']

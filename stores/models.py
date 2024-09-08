@@ -12,6 +12,13 @@ class Store(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def image_url(self):
+        if self.logo and hasattr(self.logo, 'url'):
+            return self.logo.url
+        return '/static/stores/images/default-store.jpg'  # Fallback to default image if no image is provided
+ 
 
     @property
     def product_count(self):
