@@ -18,10 +18,6 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-load_dotenv()
-
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -107,19 +103,6 @@ DATABASES = {
 }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',  # use 'django.db.backends.mysql' if using MySQL
-#         'NAME': os.getenv('MY_DATABASE_NAME'),
-#         'USER': os.getenv('MY_DATABASE_USER'),
-#         'PASSWORD': os.getenv('MY_DATABASE_PASSWORD'),
-#         'HOST': os.getenv('MY_DATABASE_HOST'),
-#         'PORT': os.getenv('MY_DATABASE_PORT'),
-#     }
-# }
-
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -151,64 +134,55 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+STATIC_URL = '/static/'
+
+# Define the directory where Django will collect static files
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+# Media files (User-uploaded content like images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 ### ADDED FROM FOR AWS BUCKET
 ### ADDED FROM FOR AWS BUCKET
 ### ADDED FROM FOR AWS BUCKET
 
-# AWS S3 Configuration
-AWS_ACCESS_KEY_ID = os.getenv('MY_AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('MY_AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('MY_AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('MY_AWS_S3_REGION_NAME')  # Change as needed
+# Load environment variables from .env file
+load_dotenv()
 
+# AWS Settings
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')  # Default region
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',  # Caching for one day
+    'CacheControl': 'max-age=86400',
 }
 
-# Static files configuration
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+# Static files (CSS, JavaScript, Images)
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
-# Media files configuration
+# Media files
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
-# Static storage settings
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "access_key": AWS_ACCESS_KEY_ID,
-            "secret_key": AWS_SECRET_ACCESS_KEY,
-            "bucket_name":AWS_STORAGE_BUCKET_NAME,
-            "region_name": AWS_S3_REGION_NAME,
-            # "default_acl": None,
-            # "file_overwrite": False,
-             
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-        "OPTIONS": {
-            "access_key": AWS_ACCESS_KEY_ID,
-            "secret_key": AWS_SECRET_ACCESS_KEY,
-            "bucket_name": AWS_STORAGE_BUCKET_NAME,
-            "region_name": AWS_S3_REGION_NAME,
-            # "default_acl": None,
-            # "file_overwrite": False,
-        },
-    },
-}
-
-
-# # Media file location example for user-uploaded content
-# MEDIA_ROOT = BASE_DIR / "media"
+# Additional settings for file storage
+AWS_DEFAULT_ACL = None  # Disable default permissions for uploaded files
+AWS_S3_FILE_OVERWRITE = False  # Avoid overwriting files with the same name
 
 
 ### ADDED STOP FOR AWS BUCKET
 ### ADDED STOP FOR AWS BUCKET
 ### ADDED STOP FOR AWS BUCKET
+
+
+
+
 
 
 # Default primary key field type
