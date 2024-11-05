@@ -18,7 +18,7 @@ class Product(models.Model):
     stock = models.IntegerField()
     store = models.ForeignKey(Store, related_name='products', on_delete=models.SET_NULL, null=True, blank=True)
     categories = models.ManyToManyField(Category, related_name='products')
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

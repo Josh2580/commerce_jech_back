@@ -1,6 +1,11 @@
 ecomenv
 db.*
-*pycache*
-*migrations*
-*.cypthon*
+__pycache__
 migrations
+.github
+confirm_aws.py
+Dockerfile
+db.sqlite3
+.env
+.github
+docker-compose.yml
