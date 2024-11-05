@@ -4,8 +4,10 @@ db.*
 *migrations*
 *.cypthon*
 migrations
+.github
 confirm_aws.py
 Dockerfile
 db.sqlite3
 .env
+.github
 docker-compose.yml
