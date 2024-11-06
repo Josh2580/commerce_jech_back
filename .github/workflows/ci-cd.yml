@@ -24,17 +24,19 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }} # Update this if your region is different
+          aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
 
       # Step 2: Log in to Amazon ECR
+
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region us-east-00 | docker login --username AWS --password-stdin 980921722238.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build and push Docker image
         run: |
           docker build -t my-backend-app .
           docker tag my-backend-app:latest 980921722238.dkr.ecr.us-east-1.amazonaws.com/my-backend-app:latest
-          docker push 980921722238.dkr.ecr.us-east-1.amazonaws.com/my-backend-app:latest
+          docker push 00980921722238.dkr.ecr.us-east-1.amazonaws.com/my-backend-app:latest
 
       - name: Update ECS Service
         run: |
