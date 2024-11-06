@@ -1,4 +1,4 @@
-name: Client View React CI/CD Pipeline
+name: Server Pipeline
 
 on:
   push:
@@ -26,6 +26,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }} # Update this if your region is different
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
           ecr-repository-uri: ${{ secrets.ECR_REPOSITORY_URI }}
+          ecs-backend-service-name: ${{ secrets.ECS_BACKEND_SERVICE_NAME }}
+          ecs-cluster-name: ${{ secrets.ECS_CLUSTER_NAME }}
 
       # Step 2: Log in to Amazon ECR
 
@@ -41,4 +43,4 @@ jobs:
 
       - name: Update ECS Service
         run: |
-          aws ecs update-service --cluster aaaMy-React-App-Cluster --service My-Backend-App-Service --force-new-deployment
+          aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
