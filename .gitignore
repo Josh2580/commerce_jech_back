@@ -1,6 +1,8 @@
 ecomenv
 __pycache__
+*/__pycache__/
 migrations
+*/migrations/
 .github
 confirm_aws.py
 Dockerfile
