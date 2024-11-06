@@ -26,6 +26,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }} # Update this if your region is different
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
           ecr-repository-uri: ${{ secrets.ECR_REPOSITORY_URI }}
+          # ecr-repository-uri: ${{ secrets.ECR_REPOSITORY_URI }}
           ecs-backend-service-name: ${{ secrets.ECS_BACKEND_SERVICE_NAME }}
           ecs-cluster-name: ${{ secrets.ECS_CLUSTER_NAME }}
 
@@ -37,7 +38,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t my-backend-app .
+          docker build ${{ secrets.ECR_BACKEND_REPOSITORY_NAME }} .
           docker tag my-backend-app:latest ${{ secrets.ECR_REPOSITORY_URI }}
           docker push ${{ secrets.ECR_REPOSITORY_URI }}
 
