@@ -1,0 +1,38 @@
+name: Server CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      # ECR_FRONTEND_REPOSITORY_NAME: ${{ secrets.ECR_FRONTEND_REPOSITORY_NAME }}
+      ECR_BACKEND_REPOSITORY_NAME: ${{ secrets.ECR_BACKEND_REPOSITORY_NAME }}
+      ECS_CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME }}
+      # ECS_FRONTEND_SERVICE_NAME: ${{ secrets.ECS_FRONTEND_SERVICE_NAME }}
+      ECS_BACKEND_SERVICE_NAME: ${{ secrets.ECS_BACKEND_SERVICE_NAME }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      - name: Build backend Docker image
+        working-directory: ./backend
+        run: docker build -t ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPOSITORY_NAME }}:latest .
+
+      - name: Push backend Docker image to ECR
+        run: docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPOSITORY_NAME }}:latest
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service --cluster ${{ env.ECS_CLUSTER_NAME }} --service ${{ env.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment --region ${{ env.AWS_REGION }}

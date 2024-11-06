@@ -3,10 +3,7 @@ __pycache__
 */__pycache__/
 migrations
 */migrations/
-.github
 confirm_aws.py
-Dockerfile
-.github
 docker-compose.yml
 .env
 db.sqlite3
