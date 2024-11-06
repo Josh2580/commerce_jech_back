@@ -18,21 +18,38 @@ jobs:
       ECS_BACKEND_SERVICE_NAME: ${{ secrets.ECS_BACKEND_SERVICE_NAME }}
 
     steps:
+      # Step 1: Check out the code
       - name: Check out code
         uses: actions/checkout@v3
 
-      # Step 2: Log in to Amazon ECR
+      # Step 2: Configure AWS credentials
+      # This action will set up the AWS credentials needed to authenticate AWS CLI commands.
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Step 3: Log in to Amazon ECR
+      # Logs in to Amazon ECR using the credentials configured in the previous step.
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
+      # Step 4: Build the backend Docker image
+      # Builds the Docker image for the backend service.
       - name: Build backend Docker image
         working-directory: ./backend
         run: docker build -t ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPOSITORY_NAME }}:latest .
 
+      # Step 5: Push the Docker image to Amazon ECR
+      # Pushes the built image to the ECR repository.
       - name: Push backend Docker image to ECR
         run: docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_BACKEND_REPOSITORY_NAME }}:latest
 
+      # Step 6: Update the ECS service
+      # Forces a new deployment to ECS to pull the latest Docker image from ECR.
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${{ env.ECS_CLUSTER_NAME }} --service ${{ env.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment --region ${{ env.AWS_REGION }}
