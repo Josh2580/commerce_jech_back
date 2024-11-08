@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Set environment variables from secrets for the database configuration
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
@@ -28,15 +27,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Step 1: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }} # Update this if your region is different
-
-      # Step 2: Log in to Amazon ECR # docker build -t my-backend-app .
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         run: |
@@ -44,10 +40,20 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t  ${{ secrets.ECR_BACKEND_REPOSITORY_NAME }} .
+          docker build -t my-backend-app .
           docker tag my-backend-app:latest ${{ secrets.ECR_REPOSITORY_URI }}
           docker push ${{ secrets.ECR_REPOSITORY_URI }}
 
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+
+      # Optional: Run database migrations and collect static files on ECS
+      - name: Run database migrations and collect static files
+        run: |
+          aws ecs execute-command \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --task $(aws ecs list-tasks --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service-name ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --desired-status RUNNING --query "taskArns[0]" --output text) \
+            --container my-backend-app \
+            --interactive \
+            --command "python manage.py migrate && python manage.py collectstatic --noinput"
