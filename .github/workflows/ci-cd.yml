@@ -8,6 +8,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      # Set environment variables from secrets for the database configuration
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+      MY_DATABASE_NAME: ${{ secrets.MY_DATABASE_NAME }}
+      MY_DATABASE_USER: ${{ secrets.MY_DATABASE_USER }}
+      MY_DATABASE_PASSWORD: ${{ secrets.MY_DATABASE_PASSWORD }}
+      MY_DATABASE_HOST: ${{ secrets.MY_DATABASE_HOST }}
+      MY_DATABASE_PORT: ${{ secrets.MY_DATABASE_PORT }}
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3

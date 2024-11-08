@@ -23,12 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hc-!3!k-%^rhhtsw!hug7sh&r%6$3sjgjb5%c)c@u7g9i-bpx6'
-
+SECRET_KEY = os.getenv('MY_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["alb-1442527775.us-east-1.elb.amazonaws.com"]
+ALLOWED_HOSTS = ["alb-1442527775.us-east-1.elb.amazonaws.com", "127.0.0.1", "commerceview.netlify.app"]
 
 
 # Application definition
@@ -95,12 +94,28 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
+# DATABASES settings
+# if os.getenv('DJANGO_ENV') == 'production':
+    # AWS RDS Configuration
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('MY_DATABASE_NAME'),  # RDS database name
+            'USER': os.getenv('MY_DATABASE_USER'),  # RDS database user
+            'PASSWORD': os.getenv('MY_DATABASE_PASSWORD'),  # RDS database password
+            'HOST': os.getenv('MY_DATABASE_HOST'),  # RDS instance endpoint
+            'PORT': os.getenv('MY_DATABASE_PORT'),  # Default PostgreSQL port
+        }
     }
-}
+# else:
+    # Local Development Configuration
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': BASE_DIR / 'db.sqlite3',
+    #     }
+    # }
 
 
 # Password validation
@@ -157,7 +172,7 @@ load_dotenv()
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')  # Default region
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')  # Default region
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
