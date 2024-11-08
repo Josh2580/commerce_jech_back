@@ -58,7 +58,7 @@ jobs:
             aws ecs execute-command \
               --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
               --task "$TASK_ARN" \
-              --container my-backend-app \
+              --container my-backend-container \
               --interactive \
               --command "python manage.py migrate && python manage.py collectstatic --noinput"
           else
