@@ -44,23 +44,20 @@ jobs:
           docker tag my-backend-app:latest ${{ secrets.ECR_REPOSITORY_URI }}
           docker push ${{ secrets.ECR_REPOSITORY_URI }}
 
+      - name: Run database migrations
+        env:
+          MY_DATABASE_NAME: ${{ secrets.MY_DATABASE_NAME }}
+          MY_DATABASE_USER: ${{ secrets.MY_DATABASE_USER }}
+          MY_DATABASE_PASSWORD: ${{ secrets.MY_DATABASE_PASSWORD }}
+          MY_DATABASE_HOST: ${{ secrets.MY_DATABASE_HOST }}
+          MY_DATABASE_PORT: ${{ secrets.MY_DATABASE_PORT }}
+        run: |
+          python manage.py migrate
+
+      - name: Collect static files
+        run: |
+          python manage.py collectstatic --noinput
+
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
-
-      # Optional: Run database migrations and collect static files on ECS
-      - name: Run database migrations and collect static files
-        run: |
-          TASK_ARN=$(aws ecs list-tasks --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service-name ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --desired-status RUNNING --query "taskArns[0]" --output text)
-
-          if [ "$TASK_ARN" != "None" ] && [ -n "$TASK_ARN" ]; then
-            echo "Executing command on task: $TASK_ARN"
-            aws ecs execute-command \
-              --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
-              --task "$TASK_ARN" \
-              --container my-backend-container \
-              --interactive \
-              --command "python manage.py migrate && python manage.py collectstatic --noinput"
-          else
-            echo "No running tasks found for service ${{ secrets.ECS_BACKEND_SERVICE_NAME }}"
-          fi
