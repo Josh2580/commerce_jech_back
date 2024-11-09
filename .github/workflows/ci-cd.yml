@@ -1,3 +1,67 @@
+# name: Server Pipeline
+
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     env:
+#       AWS_REGION: ${{ secrets.AWS_REGION }}
+#       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+#       MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+#       MY_DATABASE_NAME: ${{ secrets.MY_DATABASE_NAME }}
+#       MY_DATABASE_USER: ${{ secrets.MY_DATABASE_USER }}
+#       MY_DATABASE_PASSWORD: ${{ secrets.MY_DATABASE_PASSWORD }}
+#       MY_DATABASE_HOST: ${{ secrets.MY_DATABASE_HOST }}
+#       MY_DATABASE_PORT: ${{ secrets.MY_DATABASE_PORT }}
+
+#     steps:
+#       - name: Check out code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v3
+#         with:
+#           python-version: "3.12"
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+
+#       - name: Log in to Amazon ECR
+#         run: |
+#           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+#       - name: Build and push Docker image
+#         run: |
+#           docker build -t my-backend-app .
+#           docker tag my-backend-app:latest ${{ secrets.ECR_REPOSITORY_URI }}
+#           docker push ${{ secrets.ECR_REPOSITORY_URI }}
+
+#       - name: Run database migrations
+#         env:
+#           MY_DATABASE_NAME: ${{ secrets.MY_DATABASE_NAME }}
+#           MY_DATABASE_USER: ${{ secrets.MY_DATABASE_USER }}
+#           MY_DATABASE_PASSWORD: ${{ secrets.MY_DATABASE_PASSWORD }}
+#           MY_DATABASE_HOST: ${{ secrets.MY_DATABASE_HOST }}
+#           MY_DATABASE_PORT: ${{ secrets.MY_DATABASE_PORT }}
+#         run: |
+#           python manage.py migrate
+
+#       - name: Collect static files
+#         run: |
+#           python manage.py collectstatic --noinput
+
+#       - name: Update ECS Service
+#         run: |
+#           aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+
 name: Server Pipeline
 
 on:
@@ -38,25 +102,34 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-      - name: Build and push Docker image
+      - name: Build Docker image
         run: |
           docker build -t my-backend-app .
+
+      - name: Run migrations and collectstatic in container
+        run: |
+          docker run --rm \
+            -e MY_DATABASE_NAME=${{ secrets.MY_DATABASE_NAME }} \
+            -e MY_DATABASE_USER=${{ secrets.MY_DATABASE_USER }} \
+            -e MY_DATABASE_PASSWORD=${{ secrets.MY_DATABASE_PASSWORD }} \
+            -e MY_DATABASE_HOST=${{ secrets.MY_DATABASE_HOST }} \
+            -e MY_DATABASE_PORT=${{ secrets.MY_DATABASE_PORT }} \
+            my-backend-app python manage.py migrate
+
+      - name: Collect static files in container
+        run: |
+          docker run --rm \
+            -e MY_DATABASE_NAME=${{ secrets.MY_DATABASE_NAME }} \
+            -e MY_DATABASE_USER=${{ secrets.MY_DATABASE_USER }} \
+            -e MY_DATABASE_PASSWORD=${{ secrets.MY_DATABASE_PASSWORD }} \
+            -e MY_DATABASE_HOST=${{ secrets.MY_DATABASE_HOST }} \
+            -e MY_DATABASE_PORT=${{ secrets.MY_DATABASE_PORT }} \
+            my-backend-app python manage.py collectstatic --noinput
+
+      - name: Tag and push Docker image
+        run: |
           docker tag my-backend-app:latest ${{ secrets.ECR_REPOSITORY_URI }}
           docker push ${{ secrets.ECR_REPOSITORY_URI }}
-
-      - name: Run database migrations
-        env:
-          MY_DATABASE_NAME: ${{ secrets.MY_DATABASE_NAME }}
-          MY_DATABASE_USER: ${{ secrets.MY_DATABASE_USER }}
-          MY_DATABASE_PASSWORD: ${{ secrets.MY_DATABASE_PASSWORD }}
-          MY_DATABASE_HOST: ${{ secrets.MY_DATABASE_HOST }}
-          MY_DATABASE_PORT: ${{ secrets.MY_DATABASE_PORT }}
-        run: |
-          python manage.py migrate
-
-      - name: Collect static files
-        run: |
-          python manage.py collectstatic --noinput
 
       - name: Update ECS Service
         run: |
