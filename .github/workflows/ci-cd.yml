@@ -109,6 +109,7 @@ jobs:
       - name: Run migrations and collectstatic in container
         run: |
           docker run --rm \
+            -e MY_SECRET_KEY=${{ secrets.MY_SECRET_KEY }} \
             -e MY_DATABASE_NAME=${{ secrets.MY_DATABASE_NAME }} \
             -e MY_DATABASE_USER=${{ secrets.MY_DATABASE_USER }} \
             -e MY_DATABASE_PASSWORD=${{ secrets.MY_DATABASE_PASSWORD }} \
@@ -119,6 +120,7 @@ jobs:
       - name: Collect static files in container
         run: |
           docker run --rm \
+            -e MY_SECRET_KEY=${{ secrets.MY_SECRET_KEY }} \
             -e MY_DATABASE_NAME=${{ secrets.MY_DATABASE_NAME }} \
             -e MY_DATABASE_USER=${{ secrets.MY_DATABASE_USER }} \
             -e MY_DATABASE_PASSWORD=${{ secrets.MY_DATABASE_PASSWORD }} \
