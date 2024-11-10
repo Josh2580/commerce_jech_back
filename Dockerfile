@@ -16,6 +16,11 @@ COPY . .
 # Expose the port 8000 for Django
 EXPOSE 8000
 
+
+# Set the default environment variable (or load it later)
+ENV SECRET_KEY=${SECRET_KEY}
+
+
 # # Copy entrypoint.sh into the container and make it executable
 # COPY entrypoint.sh /entrypoint.sh
 # RUN chmod +x /entrypoint.sh
