@@ -110,12 +110,12 @@ DATABASES = {
     }
 # else:
     # Local Development Configuration
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.sqlite3',
-    #         'NAME': BASE_DIR / 'db.sqlite3',
-    #     }
-    # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -152,14 +152,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 
-# Define the directory where Django will collect static files
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+# # Define the directory where Django will collect static files
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-# Media files (User-uploaded content like images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # Media files (User-uploaded content like images)
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ### ADDED FROM FOR AWS BUCKET
 ### ADDED FROM FOR AWS BUCKET
@@ -169,13 +169,36 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 load_dotenv()
 
 # AWS Settings
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')  # Default region
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+MY_AWS_ACCESS_KEY_ID = os.getenv('MY_AWS_ACCESS_KEY_ID')
+MY_AWS_SECRET_ACCESS_KEY = os.getenv('MY_AWS_SECRET_ACCESS_KEY')
+MY_AWS_STORAGE_BUCKET_NAME = os.getenv('MY_AWS_STORAGE_BUCKET_NAME')
+MY_AWS_REGION = os.getenv('MY_AWS_REGION')  # Default region
+AWS_S3_CUSTOM_DOMAIN = f'{MY_AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key":MY_AWS_ACCESS_KEY_ID,
+            "secret_key":MY_AWS_SECRET_ACCESS_KEY,
+            "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
+            "file_overwrite":False,
+            "region_name":MY_AWS_REGION
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key":MY_AWS_ACCESS_KEY_ID,
+            "secret_key":MY_AWS_SECRET_ACCESS_KEY,
+            "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
+            "file_overwrite":False,
+            "region_name":MY_AWS_REGION
+        },
+    },
 }
 
 # Static files (CSS, JavaScript, Images)
@@ -188,7 +211,6 @@ MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 # Additional settings for file storage
 AWS_DEFAULT_ACL = None  # Disable default permissions for uploaded files
-AWS_S3_FILE_OVERWRITE = False  # Avoid overwriting files with the same name
 
 
 ### ADDED STOP FOR AWS BUCKET
