@@ -120,6 +120,8 @@ jobs:
       - name: Collect static files in container
         run: |
           docker run --rm \
+            -e MY_AWS_ACCESS_KEY_ID="${{ secrets.MY_AWS_ACCESS_KEY_ID }}" \
+            -e MY_AWS_SECRET_ACCESS_KEY="${{ secrets.MY_AWS_SECRET_ACCESS_KEY }}" \
             -e MY_SECRET_KEY="${{ secrets.MY_SECRET_KEY }}" \
             -e MY_AWS_STORAGE_BUCKET_NAME="${{ secrets.MY_AWS_STORAGE_BUCKET_NAME }}" \
             my-backend-app python manage.py collectstatic --noinput
