@@ -96,8 +96,8 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 
 # DATABASES settings
-# if os.getenv('DJANGO_ENV') == 'production':
-    # AWS RDS Configuration
+# if os.getenv('MY_DJANGO_ENV') == 'production':
+#     # AWS RDS Configuration
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -109,13 +109,13 @@ DATABASES = {
         }
     }
 # else:
-    # Local Development Configuration
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#     # Local Development Configuration
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
 #     }
-# }
 
 
 # Password validation
