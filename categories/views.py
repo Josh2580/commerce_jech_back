@@ -1,10 +1,12 @@
 # categories/views.py
 from rest_framework import generics, permissions, viewsets
 from .models import Category
-from .serializers import CategorySerializer
+from .serializers import CategorySerializer, CategorySerializerList
 from products.models import Product
 from products.serializers import ProductSerializer
 from products.permissions import IsOwnerOrReadOnly
+from rest_framework.response import Response
+
 
 # class CategoryCreateView(generics.CreateAPIView):
 #     queryset = Category.objects.all()
@@ -27,6 +29,11 @@ class CategoryViewset(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Example permission
+
+    # def list(self, request):
+    #     queryset = self.get_queryset()
+    #     serializer = CategorySerializerList(queryset, many=True)
+    #     return Response(serializer.data)
 
 
 class ProductViewSet(viewsets.ModelViewSet):

@@ -1,16 +1,7 @@
-# # products/serializers.py
-
-# class ProductSerializer(serializers.ModelSerializer):
-#     category = CategorySerializer(read_only=True)
-#     category_id = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), source='category', write_only=True)
-
-#     class Meta:
-#         model = Product
-#         fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'category_id', 'image', 'created_at', 'updated_at']
-
 # products/serializers.py
 from rest_framework import serializers
 from .models import Product, FeaturedProduct
+from rest_framework.exceptions import ValidationError
 
 class ProductSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.id')
@@ -18,6 +9,19 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'product_id', 'name', 'owner', 'slug', 'price', 'old_price', 'total_sales', 'stock', 'store', 'categories', 'image', 'image_url', 'description', 'created_at', 'updated_at']
+    
+    def validate_categories(self, categories):
+        # Check if any of the categories are root categories (no parent)
+        root_categories = categories.filter(parent=None)
+        if root_categories.exists():
+            # Collect their names
+            category_names = ", ".join([cat.name for cat in root_categories])
+            raise ValidationError(
+                f"Product cannot be associated with root categories. "
+                f"The following categories are root categories: {category_names}. "
+                f"Please assign valid subcategories."
+            )
+        return categories
 
 
 

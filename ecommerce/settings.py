@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv('MY_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["alb-1442527775.us-east-1.elb.amazonaws.com", "127.0.0.1", "commerceview.netlify.app"]
+# ALLOWED_HOSTS = ["alb-1442527775.us-east-1.elb.amazonaws.com", "127.0.0.1", "commerceview.netlify.app"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
