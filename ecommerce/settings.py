@@ -18,6 +18,9 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv()
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -97,25 +100,25 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 # DATABASES settings
 # if os.getenv('MY_DJANGO_ENV') == 'production':
-#     # AWS RDS Configuration
-DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('MY_DATABASE_NAME'),  # RDS database name
-            'USER': os.getenv('MY_DATABASE_USER'),  # RDS database user
-            'PASSWORD': os.getenv('MY_DATABASE_PASSWORD'),  # RDS database password
-            'HOST': os.getenv('MY_DATABASE_HOST'),  # RDS instance endpoint
-            'PORT': os.getenv('MY_DATABASE_PORT'),  # Default PostgreSQL port
-        }
-    }
-# else:
-#     # Local Development Configuration
-#     DATABASES = {
+# #     # AWS RDS Configuration
+# DATABASES = {
 #         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
+#             'ENGINE': 'django.db.backends.postgresql',
+#             'NAME': os.getenv('MY_DATABASE_NAME'),  # RDS database name
+#             'USER': os.getenv('MY_DATABASE_USER'),  # RDS database user
+#             'PASSWORD': os.getenv('MY_DATABASE_PASSWORD'),  # RDS database password
+#             'HOST': os.getenv('MY_DATABASE_HOST'),  # RDS instance endpoint
+#             'PORT': os.getenv('MY_DATABASE_PORT'),  # Default PostgreSQL port
 #         }
 #     }
+# else:
+#     # Local Development Configuration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
@@ -152,62 +155,61 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-# STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
-# # Define the directory where Django will collect static files
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+# Define the directory where Django will collect static files
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-# # Media files (User-uploaded content like images)
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Media files (User-uploaded content like images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ### ADDED FROM FOR AWS BUCKET
 ### ADDED FROM FOR AWS BUCKET
 ### ADDED FROM FOR AWS BUCKET
 
-# Load environment variables from .env file
-load_dotenv()
+
 
 # AWS Settings
-MY_AWS_ACCESS_KEY_ID = os.getenv('MY_AWS_ACCESS_KEY_ID')
-MY_AWS_SECRET_ACCESS_KEY = os.getenv('MY_AWS_SECRET_ACCESS_KEY')
-MY_AWS_STORAGE_BUCKET_NAME = os.getenv('MY_AWS_STORAGE_BUCKET_NAME')
-MY_AWS_REGION = os.getenv('MY_AWS_REGION')  # Default region
-AWS_S3_CUSTOM_DOMAIN = f'{MY_AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+# MY_AWS_ACCESS_KEY_ID = os.getenv('MY_AWS_ACCESS_KEY_ID')
+# MY_AWS_SECRET_ACCESS_KEY = os.getenv('MY_AWS_SECRET_ACCESS_KEY')
+# MY_AWS_STORAGE_BUCKET_NAME = os.getenv('MY_AWS_STORAGE_BUCKET_NAME')
+# MY_AWS_REGION = os.getenv('MY_AWS_REGION')  # Default region
+# AWS_S3_CUSTOM_DOMAIN = f'{MY_AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+# AWS_S3_OBJECT_PARAMETERS = {
+#     'CacheControl': 'max-age=86400',
+# }
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "access_key":MY_AWS_ACCESS_KEY_ID,
-            "secret_key":MY_AWS_SECRET_ACCESS_KEY,
-            "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
-            "file_overwrite":False,
-            "region_name":MY_AWS_REGION
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "access_key":MY_AWS_ACCESS_KEY_ID,
-            "secret_key":MY_AWS_SECRET_ACCESS_KEY,
-            "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
-            "file_overwrite":False,
-            "region_name":MY_AWS_REGION
-        },
-    },
-}
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.s3.S3Storage",
+#         "OPTIONS": {
+#             "access_key":MY_AWS_ACCESS_KEY_ID,
+#             "secret_key":MY_AWS_SECRET_ACCESS_KEY,
+#             "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
+#             "file_overwrite":False,
+#             "region_name":MY_AWS_REGION
+#         },
+#     },
+#     "staticfiles": {
+#         "BACKEND": "storages.backends.s3.S3Storage",
+#         "OPTIONS": {
+#             "access_key":MY_AWS_ACCESS_KEY_ID,
+#             "secret_key":MY_AWS_SECRET_ACCESS_KEY,
+#             "bucket_name":MY_AWS_STORAGE_BUCKET_NAME,
+#             "file_overwrite":False,
+#             "region_name":MY_AWS_REGION
+#         },
+#     },
+# }
 
-# Static files (CSS, JavaScript, Images)
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+# # Static files (CSS, JavaScript, Images)
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
 
-# Media files
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+# # Media files
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 # Additional settings for file storage
 AWS_DEFAULT_ACL = None  # Disable default permissions for uploaded files
@@ -235,7 +237,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 4,
+    'PAGE_SIZE': 10,
 
     
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -250,11 +252,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173"
 ]
 
-# Session will expire after 1 week (604800 seconds)
-SESSION_COOKIE_AGE = 604800  
+# # Session will expire after 1 week (604800 seconds)
+# SESSION_COOKIE_AGE = 604800  
 
-# Session will not expire when the browser is closed
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# # Session will not expire when the browser is closed
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 
 
