@@ -5,8 +5,8 @@ from products.serializers import ProductSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
-    # products = ProductSerializer(many=True, read_only=True)
-    products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    products = ProductSerializer(many=True, read_only=True)
+    # products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Category
@@ -14,6 +14,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def get_subcategories(self, obj):
         return CategorySerializer(obj.subcategories.all(), many=True).data
+    
+    def validate_parent(self, value):
+        """
+        Validate that a subcategory cannot have another subcategory as its parent.
+        """
+        if value and value.parent is not None:  # Check if parent exists and is itself a subcategory
+            raise serializers.ValidationError(
+                f"A subcategory cannot use another subcategory ('{value.name}') as its parent."
+            )
+        return value
 
 class CategorySerializerList(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()

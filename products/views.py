@@ -1,22 +1,30 @@
 
 # products/views.py
-from rest_framework import generics, permissions, serializers, filters
+from rest_framework import generics, permissions, serializers, filters, viewsets
 from .models import Product, FeaturedProduct
 from .serializers import ProductSerializer, FeaturedProductSerializer
 from .permissions import IsOwnerOrReadOnly
 from stores.models import Store
 
 # List and Create Products
-class ProductListCreateView(generics.ListCreateAPIView):
+
+class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filter_backends = [filters.OrderingFilter]
     ## Ordered by date and number of sales
     ordering_fields = ['created_at', 'total_sales']  
+
+    def get_queryset(self):
+        """
+        Filter products by subcategory (subcategory ID from nested router).
+        """
+        subcategory_id = self.kwargs.get('subcategory_pk') ## subcategory_pk from subcategory url lookup
+        if subcategory_id:
+            return Product.objects.filter(categories__id=subcategory_id)
+        return super().get_queryset()
     
-
-
     def perform_create(self, serializer):
         user = self.request.user
         store_id = self.request.data.get('store')
@@ -37,11 +45,6 @@ class ProductListCreateView(generics.ListCreateAPIView):
         # Save the product with the store and owner
         serializer.save(store=store, owner=user)
 
-
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # List all featured products

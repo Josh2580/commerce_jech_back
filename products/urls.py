@@ -1,13 +1,17 @@
 # products/urls.py
-from django.urls import path
-from .views import ProductDetailView, ProductListCreateView, FeaturedProductListCreateView, FeaturedProductDetailView
+from django.urls import path, include
+from rest_framework_nested import routers
+from .views import ProductViewSet, FeaturedProductListCreateView, FeaturedProductDetailView
 
+# Root router for categories
+router = routers.SimpleRouter()
+router.register(r'', ProductViewSet, basename='products')
 
 urlpatterns = [
-    path('', ProductListCreateView.as_view(), name='product-list-create'),
-    path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+    path('', include(router.urls)),
     path('featured/', FeaturedProductListCreateView.as_view(), name='featured-products-list'),
     path('featured/<int:pk>/', FeaturedProductDetailView.as_view(), name='featured-product-detail'),
 
 ]
+
 

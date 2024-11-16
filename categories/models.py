@@ -1,6 +1,7 @@
 # categories/models.py
 from django.db import models
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 
 class Category(models.Model):
@@ -13,6 +14,9 @@ class Category(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
+        # if self.parent and self.parent.parent is not None:
+        #     raise ValidationError(f"A subcategory cannot use another subcategory {self.parent.name} as its parent.")
+
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
