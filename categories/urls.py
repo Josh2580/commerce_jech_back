@@ -17,9 +17,10 @@ product_router.register(r'products', ProductViewSet, basename='subcategory-produ
 
 # Include all routers in the URL patterns
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(router.urls) ),
     path('', include(subcategory_router.urls)),
     path('', include(product_router.urls)),
+
 ]
 
 

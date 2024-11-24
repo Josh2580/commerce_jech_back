@@ -1,10 +1,13 @@
 # stores/models.py
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+
 
 class Store(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='stores', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
     description = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to='stores/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -23,3 +26,13 @@ class Store(models.Model):
     @property
     def product_count(self):
         return self.products.count()
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            slug = slugify(self.name)
+            counter = 1
+            while Store.objects.filter(owner=self.owner, slug=slug).exists():
+                slug = f'{slug}-{counter}'
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)

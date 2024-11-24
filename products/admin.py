@@ -5,7 +5,7 @@ from .form import ProductAdminForm
 
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
-    list_display = ('product_id', 'name', 'price', 'store', 'slug')
+    list_display = ('id', 'product_id', 'name', 'price', 'store', 'slug')
     prepopulated_fields = {'slug': ('name',)}  # Optionally prepopulate slug in the admin
 
 admin.site.register(Product, ProductAdmin)

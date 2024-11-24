@@ -6,7 +6,8 @@ from products.serializers import ProductSerializer
 
 
 class StoreSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True)
+    # products = ProductSerializer(many=True, read_only=True)
+    products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Store

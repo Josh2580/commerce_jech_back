@@ -8,9 +8,9 @@ router = routers.SimpleRouter()
 router.register(r'', ProductViewSet, basename='products')
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('featured/', FeaturedProductListCreateView.as_view(), name='featured-products-list'),
     path('featured/<int:pk>/', FeaturedProductDetailView.as_view(), name='featured-product-detail'),
+    path('', include(router.urls)),
 
 ]
 

@@ -37,24 +37,13 @@ class Product(models.Model):
             return self.image.url
         return '/static/products/images/default-product.jpg'  # Fallback to default image if no image is provided
  
+    @property
+    def store_name(self):
+        if self.store:
+            return self.store.name
+ 
 
     def save(self, *args, **kwargs):
-        # print(f"Saving Printing Confirmation: {self.categories.filter(parent=None).exists()}")
-        # if self.categories.filter(parent=None).exists():
-        #     the_cat = self.categories.filter(parent=None)
-        #     for cat in the_cat:
-        #         print(cat.slug)
-        #     raise ValidationError("Product Now cannot be associated with root categories. Assign valid subcategories.")
-            
-        # # # Check if all associated categories have a parent
-        # for category in self.categories.all():
-        #     # print(f"Looping Printing Confirmation: {category.parent}")
-        #     pass
-
-        #     if category.is_root_category:
-        #         raise ValueError(f"Product cannot be saved with root category: {category.name}.")
-        
-
         if not self.slug:
             slug = slugify(self.name)
             counter = 1
