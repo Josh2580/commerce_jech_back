@@ -1,5 +1,5 @@
 # cart/views.py
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import Cart, CartItem
@@ -14,14 +14,25 @@ class CartRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         auth_user = self.request.user.is_authenticated
         user = self.request.user    
-        session_key = self.request.session.session_key or self.request.session.create()
+        # session_key = self.request.session.session_key or self.request.session.create()
 
-        
+        # # Get or create the session key
+        # session_key = self.request.session.session_key
+        session_key = self.request.session.session_key
+        print(f"income session key {session_key}")
+        if not session_key:
+            self.request.session.create()
+            session_key = self.request.session.session_key
+            print(f"created session key {session_key}")
+
 
 
         if auth_user:
             try:
+                # If there's a cart linked to the session, merge it with the user's cart
                 session_cart = Cart.objects.filter(session_key=session_key).first()
+
+                # Handle authenticated user
                 user_cart = Cart.objects.get_or_create(user=user)[0]
 
                 # Return the cart's ID or any other detail you'd like to return
@@ -48,7 +59,7 @@ class CartRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     
 
 
-class CartItemCreateUpdateDeleteView(generics.CreateAPIView):
+class CartItemCreateView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -56,7 +67,15 @@ class CartItemCreateUpdateDeleteView(generics.CreateAPIView):
     def get_cart(self):
         if self.request.user.is_authenticated:
             return Cart.objects.get_or_create(user=self.request.user)[0]
-        session_key = self.request.session.session_key or self.request.session.create()
+        # session_key = self.request.session.session_key or self.request.session.create()
+        # # Get or create the session key
+
+        session_key = self.request.session.session_key
+        print(f"income session key {session_key}")
+        if not session_key:
+            self.request.session.create()
+            session_key = self.request.session.session_key
+            print(f"created session key {session_key}")
         return Cart.objects.get_or_create(session_key=session_key)[0]
 
     def perform_create(self, serializer):
@@ -71,7 +90,7 @@ class CartItemCreateUpdateDeleteView(generics.CreateAPIView):
         if existing_item:
             # Update the quantity if the item already exists in the cart
             qty = existing_item.quantity + int(quantity)
-            existing_item.quantity = qty
+            existing_item.quantity = qty 
             existing_item.save()  # Save the updated CartItem
             serializer = CartItemSerializer(existing_item)  # Serialize the updated CartItem
             
@@ -88,22 +107,33 @@ class CartItemCreateUpdateDeleteView(generics.CreateAPIView):
     # def perform_destroy(self, instance):
     #     instance.delete()
 
+
 class CartItemUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_cart(self):
+      
         if self.request.user.is_authenticated:
             return Cart.objects.get_or_create(user=self.request.user)[0]
-        session_key = self.request.session.session_key or self.request.session.create()
-        return Cart.objects.get_or_create(session_key=session_key)[0]
+        # session_key = self.request.session.session_key or self.request.session.create()
+        else:
+            session_key = self.request.session.session_key
+            print(f"income session key {session_key}")
+            if not session_key:
+                self.request.session.create()
+                session_key = self.request.session.session_key
+                print(f"created session key {session_key}")
+            return Cart.objects.get_or_create(session_key=session_key)[0]
 
 
     def perform_update(self, serializer):
         cart = self.get_cart()
         product_id = self.request.data.get('product')
+        # product_id = self.kwargs.get('pk') 
         product = Product.objects.get(id=product_id)
+        print(product)
         cart_item = CartItem.objects.get(cart=cart, product=product)
         serializer.save(cart=cart_item.cart)
 

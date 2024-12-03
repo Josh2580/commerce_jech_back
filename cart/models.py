@@ -35,4 +35,14 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.product.price * self.quantity
     
+    def product_data(self):
+        prod = {
+            "name":self.product.name, 
+            "price":self.product.price, 
+            "old_price":self.product.old_price,
+            "image":self.product.image_url,
+            "stock":self.product.stock,
+            } 
+        return prod
+    
     

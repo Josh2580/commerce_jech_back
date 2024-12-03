@@ -11,7 +11,14 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'subtotal', 'added_at']
+        fields = ['id', 'product', 'product_data', 'quantity', 'subtotal', 'added_at']
+    
+    # def update(self, instance, validated_data):
+    #     # Handle partial updates safely
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.save()
+    #     return instance
 
  
 

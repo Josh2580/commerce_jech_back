@@ -83,3 +83,6 @@ class FeaturedProduct(models.Model):
         return (self.start_date is None or self.start_date <= now) and (self.end_date is None or self.end_date >= now)
         # return (self.start_date <= now) and (self.end_date >= now)
 
+
+
+#a7026922-ba20-4b45-a5e6-e84927fb6214
