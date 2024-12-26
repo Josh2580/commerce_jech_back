@@ -1,8 +1,11 @@
 # orders/models.py
-import uuid
+import uuid  
 from django.conf import settings
 from django.db import models
 from products.models import Product
+from payments.models import PaymentMethod
+from django.db import models
+from address.models import Address
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -15,16 +18,16 @@ class Order(models.Model):
 
     order_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='orders', on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, related_name='order_address', on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    total = models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_address = models.TextField()
-    payment_status = models.CharField(max_length=20, default='pending')
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'Order {self.order_id} - {self.user.email}'
-
+ 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)

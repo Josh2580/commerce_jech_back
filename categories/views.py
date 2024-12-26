@@ -3,10 +3,13 @@ from rest_framework import viewsets, filters
 from .models import Category
 from products.models import Product
 from .serializers import CategorySerializer
+from ecommerce.pagination import MyCustomPagination
 
 class CategoryViewset(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = MyCustomPagination
+
     filterset_fields = ['parent__subcategories']
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['parent']  

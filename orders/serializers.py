@@ -5,14 +5,17 @@ from products.serializers import ProductSerializer
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
-    subtotal = serializers.SerializerMethodField()
+    # subtotal = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'price', 'subtotal']
+        # fields = ['id', 'product', 'quantity', 'price', 'subtotal']
+        fields = ['id', 'product', 'quantity', 'price']
+        read_only_fields = ['quantity', 'price']
 
-    def get_subtotal(self, obj):
-        return obj.subtotal()
+
+    # def get_subtotal(self, obj):
+    #     return obj.subtotal()
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
@@ -21,12 +24,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = [ 'id','order_id', 'user', 'status', 'total', 'shipping_address', 'payment_status', 'items', 'created_at', 'updated_at']
+        fields = [ 'id','order_id', 'user', 'status', 'total', 'address', 'payment_method', 'items', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'user', 'total']
 
-    def create(self, validated_data):
-        items_data = self.context['items']
-        total = sum(item['price'] * item['quantity'] for item in items_data)
-        order = Order.objects.create(total=total, **validated_data)
-        for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
-        return order
+
+    # def create(self, validated_data):
+    #     items_data = self.context['items']
+    #     total = sum(item['price'] * item['quantity'] for item in items_data)
+    #     order = Order.objects.create(total=total, **validated_data)
+    #     for item_data in items_data:
+    #         OrderItem.objects.create(order=order, **item_data)
+    #     return order

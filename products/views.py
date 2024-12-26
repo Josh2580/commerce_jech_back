@@ -1,6 +1,6 @@
 
 # products/views.py
-from rest_framework import generics, permissions, serializers, viewsets,filters
+from rest_framework import generics, permissions, serializers, viewsets,filters, pagination
 from .models import Product, FeaturedProduct
 from .serializers import ProductSerializer, FeaturedProductSerializer
 from .permissions import IsOwnerOrReadOnly
@@ -8,6 +8,7 @@ from stores.models import Store
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from reviews.serializers import ReviewSerializer
+from ecommerce.pagination import MyCustomPagination
 
 # List and Create Products
 class ProductViewSet(viewsets.ModelViewSet):
@@ -16,6 +17,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    # permission_classes = [permissions.AllowAny]
+    pagination_class = MyCustomPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['categories', 'store']
     ordering_fields = ['total_sales', 'created_at', 'price']
@@ -75,13 +78,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer.save(store=store, owner=user)
 
 
-
-
-
 # List all featured products
 class FeaturedProductListCreateView(generics.ListCreateAPIView):
     queryset = FeaturedProduct.objects.all()
     serializer_class = FeaturedProductSerializer
+    pagination_class = MyCustomPagination
+
     # permission_classes = [permissions.IsAdminUser]
 
     def perform_create(self, serializer):

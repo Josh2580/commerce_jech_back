@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
 
-
+ 
 class Store(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='stores', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)

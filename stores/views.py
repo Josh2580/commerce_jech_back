@@ -4,6 +4,7 @@ from .models import Store
 from .serializers import StoreSerializer
 from stores.permissions import IsOwnerOrReadOnly
 from products.serializers import ProductSerializer
+from ecommerce.pagination import MyCustomPagination
 
 # class StoreListCreateView(generics.ListCreateAPIView):
 #     queryset = Store.objects.all()
@@ -30,6 +31,8 @@ from products.serializers import ProductSerializer
 class StoreViewset(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
+    pagination_class = MyCustomPagination
+
     # filterset_fields = ['parent__subcategories']
     # filter_backends = [filters.OrderingFilter]
     # ordering_fields = ['parent']  
