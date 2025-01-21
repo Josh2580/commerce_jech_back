@@ -9,7 +9,7 @@ class Address(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     address_line1 = models.CharField(max_length=255)
     address_line2 = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.IntegerField(max_length=55, blank=True, null=True)
+    phone = models.IntegerField(blank=True, null=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)

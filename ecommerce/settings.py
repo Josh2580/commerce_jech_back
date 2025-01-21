@@ -15,6 +15,18 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
+# import environ
+
+# # Initialize environment variables
+# env = environ.Env()
+
+# # Read .env file
+# environ.Env.read_env()
+
+# # Example usage in settings
+# SECRET_KEY = env('SECRET_KEY')
+# DEBUG = env.bool('DEBUG', default=False)
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

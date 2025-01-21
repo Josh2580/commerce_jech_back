@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from .models import Order, OrderItem
 from products.serializers import ProductSerializer
+from payments.serializers import TransactionSerializer
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
@@ -19,13 +20,25 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    latest_transaction = serializers.SerializerMethodField()
     total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     user = serializers.ReadOnlyField(source='user.id')
 
     class Meta:
         model = Order
-        fields = [ 'id','order_id', 'user', 'status', 'total', 'address', 'payment_method', 'items', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at', 'user', 'total']
+        fields = [ 'id','order_id', 'user', 'status', 'total', 'address', 'payment_method',  'created_at', 'updated_at', 'order_transactions', 'latest_transaction', 'items']
+        read_only_fields = ['created_at', 'updated_at', 'user', 'total', 'order_transactions']
+        # depth = 1
+
+
+
+    def get_latest_transaction(self, obj):
+        # Fetch the latest transaction using the model method
+        transaction = obj.latest_transaction()
+        if transaction:
+            return TransactionSerializer(transaction).data
+        return None
+
 
 
     # def create(self, validated_data):
@@ -34,4 +47,4 @@ class OrderSerializer(serializers.ModelSerializer):
     #     order = Order.objects.create(total=total, **validated_data)
     #     for item_data in items_data:
     #         OrderItem.objects.create(order=order, **item_data)
-    #     return order
+    #     return order 

@@ -8,7 +8,7 @@ class ProductSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'product_id', 'name', 'owner', 'store_name', 'slug', 'price', 'old_price', 'total_sales', 'stock', 'store', 'categories', 'image', 'image_url', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'product_id', 'name', 'owner', 'views', 'store_name', 'slug', 'price', 'old_price', 'total_sales', 'stock', 'store', 'image', 'image_url',  'description', 'created_at', 'updated_at', 'categories', 'categories_info']
     
     def validate_categories(self, categories):
         # Check if any of the categories are root categories (no parent)

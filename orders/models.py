@@ -3,10 +3,11 @@ import uuid
 from django.conf import settings
 from django.db import models
 from products.models import Product
-from payments.models import PaymentMethod
+# from payments.models import PaymentMethod
+from payments.models_methods import PaymentMethod
 from django.db import models
 from address.models import Address
-
+ 
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -27,6 +28,10 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Order {self.order_id} - {self.user.email}'
+    
+    def latest_transaction(self):
+        # Retrieve the latest transaction based on creation time
+        return self.order_transactions.order_by('-created_at').first()
  
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)

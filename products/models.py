@@ -26,6 +26,8 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total_sales = models.PositiveIntegerField(default=0)
+    views = models.PositiveIntegerField(default=0)
+    
 
     def __str__(self):
         return self.name
@@ -41,6 +43,21 @@ class Product(models.Model):
     def store_name(self):
         if self.store:
             return self.store.name
+    
+    @property
+    def categories_info(self):
+        cat = []
+        for ct in self.categories.all():
+            cat.append({
+                 "name":ct.name, 
+                 "id":ct.id, 
+                 "image":ct.image_url,
+                 "slug":ct.slug
+                })
+            # cat.append(o)
+
+    
+        return cat
  
 
     def save(self, *args, **kwargs):
